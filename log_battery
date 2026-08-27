@@ -1,0 +1,193 @@
+--------- beginning of main
+08-15 13:55:29.007 13592 13592 E FoilTracker: LocationService created
+08-15 13:55:29.035 13592 13592 E FoilTracker: UGUU45 Creating GPX: /data/user/0/com.example.foiltracker/files/foiltrack_20260815_135529.gpx and hashcode=236535094
+08-15 13:55:29.039 13592 13592 E FoilTracker: Starting GPS_PROVIDER: interval=1000ms
+08-15 13:55:29.047 13592 13592 E FoilTracker: UGUU3-45 requestLocationUpdates RETURNED
+08-15 14:01:17.889 14078 14078 E FoilTracker: LocationService created
+08-15 14:01:17.917 14078 14078 E FoilTracker: UGUU45 Creating GPX: /data/user/0/com.example.foiltracker/files/foiltrack_20260815_140117.gpx
+08-15 14:01:17.920 14078 14078 E FoilTracker: Starting GPS_PROVIDER: interval=1000ms
+08-15 14:01:17.928 14078 14078 E FoilTracker: UGUU45 requestLocationUpdates RETURNED
+08-15 14:01:17.943 14078 14078 E FoilTracker: UGUU45 LAST LOCATION = null
+08-15 14:05:48.718 14481 14481 E FoilTracker: LocationService created
+08-15 14:05:48.746 14481 14481 E FoilTracker: UGUU45 Creating GPX: /data/user/0/com.example.foiltracker/files/foiltrack_20260815_140548.gpx
+08-15 14:05:48.749 14481 14481 E FoilTracker: Starting GPS_PROVIDER: interval=1000ms
+08-15 14:05:48.759 14481 14481 E FoilTracker: GNSS status callback registered
+08-15 14:05:48.768 14481 14481 E FoilTracker: UGUU45 requestLocationUpdates RETURNED
+08-15 14:05:48.770 14481 14481 E FoilTracker: UGUU45 LAST LOCATION = null
+08-15 14:05:48.805 14481 14481 E FoilTracker: !!! GNSS STARTED !!!
+08-15 14:05:50.095 14481 14481 E FoilTracker: GNSS satellites visible=3 usedInFix=0
+08-15 14:05:50.908 14481 14481 E FoilTracker: GNSS satellites visible=8 usedInFix=5
+08-15 14:05:51.890 14481 14481 E FoilTracker: GNSS satellites visible=18 usedInFix=17
+08-15 14:05:51.960 14481 14481 E FoilTracker: !!! GPS CALLBACK !!!
+08-15 14:05:51.960 14481 14481 E FoilTracker: provider=gps
+08-15 14:05:51.961 14481 14481 E FoilTracker: lat=43.44226323533803
+08-15 14:05:51.962 14481 14481 E FoilTracker: lon=2.030067192390561
+08-15 14:05:51.962 14481 14481 E FoilTracker: accuracy=19.0
+08-15 14:05:51.962 14481 14481 E FoilTracker: elapsed=5372592614673
+08-15 14:05:52.868 14481 14481 E FoilTracker: GNSS satellites visible=21 usedInFix=20
+08-15 14:05:53.902 14481 14481 E FoilTracker: GNSS satellites visible=22 usedInFix=21
+08-15 14:05:53.959 14481 14481 E FoilTracker: !!! GPS CALLBACK !!!
+08-15 14:05:53.960 14481 14481 E FoilTracker: provider=gps
+08-15 14:05:53.960 14481 14481 E FoilTracker: lat=43.44231796916574
+08-15 14:05:53.960 14481 14481 E FoilTracker: lon=2.030154950916767
+08-15 14:05:53.960 14481 14481 E FoilTracker: accuracy=17.0
+08-15 14:05:53.960 14481 14481 E FoilTracker: elapsed=5374594640999
+08-15 14:05:54.849 14481 14481 E FoilTracker: GNSS satellites visible=22 usedInFix=21
+08-15 14:05:55.885 14481 14481 E FoilTracker: GNSS satellites visible=23 usedInFix=22
+08-15 14:05:55.950 14481 14481 E FoilTracker: !!! GPS CALLBACK !!!
+08-15 14:05:55.950 14481 14481 E FoilTracker: provider=gps
+08-15 14:05:55.950 14481 14481 E FoilTracker: lat=43.44233540352434
+08-15 14:05:55.950 14481 14481 E FoilTracker: lon=2.0302001293748617
+08-15 14:05:55.950 14481 14481 E FoilTracker: accuracy=12.0
+08-15 14:05:55.950 14481 14481 E FoilTracker: elapsed=5376595283657
+08-15 14:05:56.884 14481 14481 E FoilTracker: GNSS satellites visible=24 usedInFix=22
+08-15 14:05:57.863 14481 14481 E FoilTracker: GNSS satellites visible=25 usedInFix=22
+08-15 14:05:58.897 14481 14481 E FoilTracker: GNSS satellites visible=25 usedInFix=21
+08-15 14:05:58.954 14481 14481 E FoilTracker: !!! GPS CALLBACK !!!
+08-15 14:05:58.954 14481 14481 E FoilTracker: provider=gps
+08-15 14:05:58.955 14481 14481 E FoilTracker: lat=43.442334649153054
+08-15 14:05:58.955 14481 14481 E FoilTracker: lon=2.0301976148039103
+08-15 14:05:58.955 14481 14481 E FoilTracker: accuracy=9.0
+08-15 14:05:58.955 14481 14481 E FoilTracker: elapsed=5379595128044
+08-15 14:05:59.880 14481 14481 E FoilTracker: GNSS satellites visible=25 usedInFix=21
+08-15 14:05:59.955 14481 14481 E FoilTracker: !!! GPS CALLBACK !!!
+08-15 14:05:59.955 14481 14481 E FoilTracker: provider=gps
+08-15 14:05:59.955 14481 14481 E FoilTracker: lat=43.44232970383018
+08-15 14:05:59.955 14481 14481 E FoilTracker: lon=2.0302017219364643
+08-15 14:05:59.955 14481 14481 E FoilTracker: accuracy=8.5
+08-15 14:05:59.955 14481 14481 E FoilTracker: elapsed=5380594980309
+08-15 14:06:00.891 14481 14481 E FoilTracker: GNSS satellites visible=25 usedInFix=22
+08-15 14:06:00.945 14481 14481 E FoilTracker: !!! GPS CALLBACK !!!
+08-15 14:06:00.945 14481 14481 E FoilTracker: provider=gps
+08-15 14:06:00.945 14481 14481 E FoilTracker: lat=43.44232517760247
+08-15 14:06:00.945 14481 14481 E FoilTracker: lon=2.0302030630409718
+08-15 14:06:00.945 14481 14481 E FoilTracker: accuracy=8.5
+08-15 14:06:00.945 14481 14481 E FoilTracker: elapsed=5381594148539
+08-15 14:06:01.893 14481 14481 E FoilTracker: GNSS satellites visible=25 usedInFix=22
+08-15 14:06:02.895 14481 14481 E FoilTracker: GNSS satellites visible=25 usedInFix=22
+08-15 14:06:03.862 14481 14481 E FoilTracker: GNSS satellites visible=26 usedInFix=23
+08-15 14:06:03.952 14481 14481 E FoilTracker: !!! GPS CALLBACK !!!
+08-15 14:06:03.952 14481 14481 E FoilTracker: provider=gps
+08-15 14:06:03.952 14481 14481 E FoilTracker: lat=43.442310970276594
+08-15 14:06:03.952 14481 14481 E FoilTracker: lon=2.030200380831957
+08-15 14:06:03.952 14481 14481 E FoilTracker: accuracy=7.5
+08-15 14:06:03.952 14481 14481 E FoilTracker: elapsed=5384594555258
+08-15 14:06:04.894 14481 14481 E FoilTracker: GNSS satellites visible=25 usedInFix=23
+08-15 14:06:04.956 14481 14481 E FoilTracker: !!! GPS CALLBACK !!!
+08-15 14:06:04.956 14481 14481 E FoilTracker: provider=gps
+08-15 14:06:04.956 14481 14481 E FoilTracker: lat=43.442310970276594
+08-15 14:06:04.956 14481 14481 E FoilTracker: lon=2.030200380831957
+08-15 14:06:04.956 14481 14481 E FoilTracker: accuracy=7.5
+08-15 14:06:04.956 14481 14481 E FoilTracker: elapsed=5385594290349
+08-15 14:06:05.890 14481 14481 E FoilTracker: GNSS satellites visible=24 usedInFix=23
+08-15 14:06:06.901 14481 14481 E FoilTracker: GNSS satellites visible=24 usedInFix=23
+08-15 14:06:06.946 14481 14481 E FoilTracker: !!! GPS CALLBACK !!!
+08-15 14:06:06.947 14481 14481 E FoilTracker: provider=gps
+08-15 14:06:06.947 14481 14481 E FoilTracker: lat=43.442310970276594
+08-15 14:06:06.947 14481 14481 E FoilTracker: lon=2.030200380831957
+08-15 14:06:06.947 14481 14481 E FoilTracker: accuracy=7.0
+08-15 14:06:06.947 14481 14481 E FoilTracker: elapsed=5387593607978
+08-15 14:06:07.513 14481 14481 E FoilTracker: GNSS satellites visible=25 usedInFix=23
+08-15 14:06:08.455 14481 14481 E FoilTracker: GNSS satellites visible=27 usedInFix=19
+08-15 14:06:09.447 14481 14481 E FoilTracker: GNSS satellites visible=27 usedInFix=26
+08-15 14:06:10.472 14481 14481 E FoilTracker: GNSS satellites visible=27 usedInFix=19
+08-15 14:06:10.776 14481 14481 E FoilTracker: Stopping GPS
+08-15 14:06:10.780 14481 14481 E FoilTracker: GNSS status callback unregistered
+08-15 14:06:10.781 14481 14481 E FoilTracker: GPX closed: /data/user/0/com.example.foiltracker/files/foiltrack_20260815_140548.gpx
+08-15 14:06:10.800 14481 14481 E FoilTracker: LocationService destroyed
+08-15 14:06:10.801 14481 14481 E FoilTracker: GPX closed: null
+08-15 14:09:38.966 14909 14909 E FoilTracker: LocationService created
+08-15 14:09:38.997 14909 14909 E FoilTracker: UGUU45 Creating GPX: /data/user/0/com.example.foiltracker/files/foiltrack_20260815_140938.gpx
+08-15 14:09:39.001 14909 14909 E FoilTracker: Starting GPS_PROVIDER: interval=1000ms
+08-15 14:09:39.006 14909 14909 E FoilTracker: GNSS status callback registered=true
+08-15 14:09:39.015 14909 14909 E FoilTracker: UGUU45 requestLocationUpdates RETURNED
+08-15 14:09:39.059 14909 14909 E FoilTracker: UGUU45 LAST LOCATION = Location[gps 43.442311,2.030200 hAcc=7.0 et=+1h29m47s593ms alt=399.0 vAcc=9.0 vel=0.0 sAcc=0.54 {Bundle[{satellites=23, maxCn0=37, meanCn0=28}]}]
+08-15 14:09:39.076 14909 14909 E FoilTracker: BATTERY: level=52.0% raw=52/100 voltage=3864mV temperature=35.9C current=-109uA avgCurrent=-109uA power=0.4mW points=0 elapsed=0s
+08-15 14:09:39.087 14909 14909 E FoilTracker: !!! GNSS STARTED !!!
+08-15 14:09:43.357 14909 14909 E FoilTracker: GNSS satellites visible=1 usedInFix=0
+08-15 14:09:44.388 14909 14909 E FoilTracker: GNSS satellites visible=2 usedInFix=0
+08-15 14:09:45.399 14909 14909 E FoilTracker: GNSS satellites visible=4 usedInFix=0
+08-15 14:09:46.435 14909 14909 E FoilTracker: GNSS satellites visible=10 usedInFix=9
+08-15 14:09:47.361 14909 14909 E FoilTracker: GNSS satellites visible=14 usedInFix=12
+08-15 14:09:48.387 14909 14909 E FoilTracker: GNSS satellites visible=16 usedInFix=12
+08-15 14:09:49.079 14909 14909 E FoilTracker: BATTERY: level=52.0% raw=52/100 voltage=3864mV temperature=35.9C current=-109uA avgCurrent=-109uA power=0.4mW points=0 elapsed=10s
+08-15 14:09:49.080 14909 14909 E FoilTracker: BATTERY DELTA: levelDelta=0 interval=10s
+08-15 14:09:49.367 14909 14909 E FoilTracker: GNSS satellites visible=17 usedInFix=16
+08-15 14:09:50.368 14909 14909 E FoilTracker: GNSS satellites visible=18 usedInFix=12
+08-15 14:09:51.376 14909 14909 E FoilTracker: GNSS satellites visible=18 usedInFix=13
+08-15 14:09:52.409 14909 14909 E FoilTracker: GNSS satellites visible=18 usedInFix=12
+08-15 14:09:53.371 14909 14909 E FoilTracker: GNSS satellites visible=17 usedInFix=12
+08-15 14:09:54.360 14909 14909 E FoilTracker: GNSS satellites visible=17 usedInFix=12
+08-15 14:09:55.394 14909 14909 E FoilTracker: GNSS satellites visible=17 usedInFix=12
+08-15 14:09:56.370 14909 14909 E FoilTracker: GNSS satellites visible=17 usedInFix=12
+08-15 14:09:57.038 14909 14909 E FoilTracker: GNSS satellites visible=17 usedInFix=12
+08-15 14:09:58.017 14909 14909 E FoilTracker: GNSS satellites visible=18 usedInFix=12
+08-15 14:09:59.006 14909 14909 E FoilTracker: GNSS satellites visible=19 usedInFix=12
+08-15 14:09:59.109 14909 14909 E FoilTracker: BATTERY: level=52.0% raw=52/100 voltage=3814mV temperature=36.5C current=-109uA avgCurrent=-109uA power=0.4mW points=0 elapsed=20s
+08-15 14:09:59.109 14909 14909 E FoilTracker: BATTERY DELTA: levelDelta=0 interval=10s
+08-15 14:10:00.013 14909 14909 E FoilTracker: GNSS satellites visible=19 usedInFix=12
+08-15 14:10:01.039 14909 14909 E FoilTracker: GNSS satellites visible=19 usedInFix=12
+08-15 14:10:02.051 14909 14909 E FoilTracker: GNSS satellites visible=19 usedInFix=14
+08-15 14:10:03.024 14909 14909 E FoilTracker: GNSS satellites visible=20 usedInFix=12
+08-15 14:10:04.255 14909 14909 E FoilTracker: GNSS satellites visible=20 usedInFix=12
+08-15 14:10:05.272 14909 14909 E FoilTracker: GNSS satellites visible=22 usedInFix=18
+08-15 14:10:06.222 14909 14909 E FoilTracker: GNSS satellites visible=22 usedInFix=16
+08-15 14:10:07.226 14909 14909 E FoilTracker: GNSS satellites visible=23 usedInFix=16
+08-15 14:10:08.224 14909 14909 E FoilTracker: GNSS satellites visible=24 usedInFix=16
+08-15 14:10:09.245 14909 14909 E FoilTracker: GNSS satellites visible=25 usedInFix=15
+08-15 14:10:10.106 14909 14909 E FoilTracker: BATTERY: level=52.0% raw=52/100 voltage=3822mV temperature=36.0C current=-109uA avgCurrent=-109uA power=0.4mW points=0 elapsed=31s
+08-15 14:10:10.106 14909 14909 E FoilTracker: BATTERY DELTA: levelDelta=0 interval=10s
+08-15 14:10:10.270 14909 14909 E FoilTracker: GNSS satellites visible=25 usedInFix=15
+08-15 14:10:11.253 14909 14909 E FoilTracker: GNSS satellites visible=25 usedInFix=16
+08-15 14:10:12.230 14909 14909 E FoilTracker: GNSS satellites visible=26 usedInFix=17
+08-15 14:10:13.249 14909 14909 E FoilTracker: GNSS satellites visible=26 usedInFix=14
+08-15 14:10:14.238 14909 14909 E FoilTracker: GNSS satellites visible=27 usedInFix=12
+08-15 14:10:15.233 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=12
+08-15 14:10:16.237 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=15
+08-15 14:10:17.264 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=14
+08-15 14:10:18.255 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=19
+08-15 14:10:19.252 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=20
+08-15 14:10:20.124 14909 14909 E FoilTracker: BATTERY: level=52.0% raw=52/100 voltage=3828mV temperature=36.0C current=-109uA avgCurrent=-109uA power=0.4mW points=0 elapsed=41s
+08-15 14:10:20.124 14909 14909 E FoilTracker: BATTERY DELTA: levelDelta=0 interval=10s
+08-15 14:10:20.229 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=18
+08-15 14:10:21.207 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=15
+08-15 14:10:22.041 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=19
+08-15 14:10:23.016 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=16
+08-15 14:10:24.047 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=16
+08-15 14:10:25.034 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=13
+08-15 14:10:26.049 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=16
+08-15 14:10:27.027 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=17
+08-15 14:10:28.018 14909 14909 E FoilTracker: GNSS satellites visible=30 usedInFix=16
+08-15 14:10:28.982 14909 14909 E FoilTracker: GNSS satellites visible=30 usedInFix=14
+08-15 14:10:30.010 14909 14909 E FoilTracker: GNSS satellites visible=30 usedInFix=17
+08-15 14:10:31.055 14909 14909 E FoilTracker: GNSS satellites visible=30 usedInFix=15
+08-15 14:10:31.726 14909 14909 E FoilTracker: BATTERY: level=52.0% raw=52/100 voltage=3829mV temperature=35.9C current=-109uA avgCurrent=-109uA power=0.4mW points=0 elapsed=52s
+08-15 14:10:31.727 14909 14909 E FoilTracker: BATTERY DELTA: levelDelta=0 interval=11s
+08-15 14:10:32.040 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=15
+08-15 14:10:33.033 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=19
+08-15 14:10:34.040 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=16
+08-15 14:10:35.021 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=17
+08-15 14:10:36.065 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=18
+08-15 14:10:37.036 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=17
+08-15 14:10:38.052 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=16
+08-15 14:10:39.000 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=16
+08-15 14:10:40.004 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=15
+08-15 14:10:41.019 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=16
+08-15 14:10:42.040 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=20
+08-15 14:10:43.009 14909 14909 E FoilTracker: BATTERY: level=51.0% raw=51/100 voltage=3846mV temperature=35.6C current=-109uA avgCurrent=-109uA power=0.4mW points=0 elapsed=64s
+08-15 14:10:43.010 14909 14909 E FoilTracker: BATTERY DELTA: levelDelta=-1 interval=11s
+08-15 14:10:43.022 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=17
+08-15 14:10:44.020 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=15
+08-15 14:10:45.018 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=13
+08-15 14:10:46.041 14909 14909 E FoilTracker: GNSS satellites visible=28 usedInFix=16
+08-15 14:10:47.017 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=16
+08-15 14:10:48.024 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=16
+08-15 14:10:49.031 14909 14909 E FoilTracker: GNSS satellites visible=29 usedInFix=19
+08-15 14:10:50.051 14909 14909 E FoilTracker: GNSS satellites visible=30 usedInFix=20
+08-15 14:10:51.007 14909 14909 E FoilTracker: GNSS satellites visible=30 usedInFix=19
+08-15 14:10:52.063 14909 14909 E FoilTracker: GNSS satellites visible=30 usedInFix=19
+08-15 14:10:53.023 14909 14909 E FoilTracker: GNSS satellites visible=30 usedInFix=16
+08-15 14:10:53.859 14909 14909 E FoilTracker: BATTERY: level=51.0% raw=51/100 voltage=3837mV temperature=35.5C current=-109uA avgCurrent=-109uA power=0.4mW points=0 elapsed=74s
+08-15 14:10:53.860 14909 14909 E FoilTracker: BATTERY DELTA: levelDelta=0 interval=10s
+08-15 14:10:54.043 14909 14909 E FoilTracker: GNSS satellites visible=30 usedInFix=18
+08-15 14:10:55.051 14909 14909 E FoilTracker: GNSS satellites visible=30 usedInFix=17
