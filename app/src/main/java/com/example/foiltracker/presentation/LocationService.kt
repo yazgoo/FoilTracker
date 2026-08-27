@@ -6,11 +6,11 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.location.Location
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Build
 import android.os.IBinder
+import android.os.SystemClock
 import androidx.concurrent.futures.await
 import androidx.core.app.NotificationCompat
 import androidx.health.services.client.ExerciseUpdateCallback
@@ -21,6 +21,9 @@ import androidx.health.services.client.data.ExerciseConfig
 import androidx.health.services.client.data.ExerciseLapSummary
 import androidx.health.services.client.data.ExerciseType
 import androidx.health.services.client.data.ExerciseUpdate
+import com.example.foiltracker.core.RunDurationEvent
+import com.example.foiltracker.core.RunDurationCalculator
+import com.example.foiltracker.core.TrackPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -39,8 +42,12 @@ import java.util.TimeZone
 class LocationService : Service() {
 
     companion object {
-        private val _recording = MutableStateFlow(false)
-        val recording: StateFlow<Boolean> = _recording.asStateFlow()
+
+        private val _recording =
+            MutableStateFlow(false)
+
+        val recording: StateFlow<Boolean> =
+            _recording.asStateFlow()
 
         const val ACTION_START =
             "com.example.foiltracker.START"
@@ -48,38 +55,38 @@ class LocationService : Service() {
         const val ACTION_STOP =
             "com.example.foiltracker.STOP"
 
-        private const val CHANNEL_ID = "foiltracker_gps"
-        private const val NOTIFICATION_ID = 1
+        private const val CHANNEL_ID =
+            "foiltracker_gps"
 
-        private const val SPEED_THRESHOLD_KMH = 7.0
-
-        private const val MIN_SPEED_KMH = 10.0
-        private const val MAX_SPEED_KMH = 30.0
-        private const val MAX_TIME_STEP_SECONDS = 6.0
-        private const val MAX_ACCEL_MPS2 = 5.0
-        private const val MIN_TIME_SECONDS = 20.0
+        private const val NOTIFICATION_ID =
+            1
 
         private val _totalDistanceMeters =
             MutableStateFlow(0f)
 
-        val totalDistanceMeters: StateFlow<Float> =
+        val totalDistanceMeters:
+            StateFlow<Float> =
             _totalDistanceMeters.asStateFlow()
 
         private val _speedKmh =
             MutableStateFlow(0.0)
 
-        val speedKmh: StateFlow<Double> =
+        val speedKmh:
+            StateFlow<Double> =
             _speedKmh.asStateFlow()
 
         private val _runDurationSeconds =
             MutableStateFlow(0L)
 
-        val runDurationSeconds: StateFlow<Long> =
+        val runDurationSeconds:
+            StateFlow<Long> =
             _runDurationSeconds.asStateFlow()
     }
 
     private val serviceScope =
-        CoroutineScope(Dispatchers.IO + Job())
+        CoroutineScope(
+            Dispatchers.IO + Job()
+        )
 
     private val exerciseClient by lazy {
         HealthServices
@@ -94,47 +101,14 @@ class LocationService : Service() {
         )
 
     private var gpxWriter: FileWriter? = null
+
     private var currentFile: File? = null
 
-    private var lastLat: Double? = null
-    private var lastLon: Double? = null
-    private var lastLocationTimeMs: Long = 0L
+    private var accumulatedDistance =
+        0f
 
-    private var accumulatedDistance = 0f
-
-    private val minMovementMeters = 2.0f
-
-    /*
-     * Samples used to reproduce the Ruby filtering algorithm.
-     *
-     * Each sample corresponds to one calculated speed:
-     *
-     *   timeMs
-     *   speedKmh
-     */
-    private data class SpeedSample(
-        val timeMs: Long,
-        val speedKmh: Double
-    )
-
-    private val speedSamples =
-        ArrayDeque<SpeedSample>()
-
-    /*
-     * A candidate period starts when we get a valid filtered
-     * speed sample.
-     *
-     * It only becomes a real >7 km/h period once it survives:
-     *
-     *   - speed filter
-     *   - acceleration filter
-     *   - time-gap grouping
-     *   - minimum duration
-     */
-    private var candidateStartMs: Long? = null
-    private var candidateLastMs: Long? = null
-
-    private var above7SinceMs: Long? = null
+    private var calculator =
+        RunDurationCalculator()
 
     private val exerciseUpdateCallback =
         object : ExerciseUpdateCallback {
@@ -142,6 +116,7 @@ class LocationService : Service() {
             override fun onExerciseUpdateReceived(
                 update: ExerciseUpdate
             ) {
+
                 val locationDataPoints =
                     update.latestMetrics.getData(
                         DataType.LOCATION
@@ -157,7 +132,7 @@ class LocationService : Service() {
                  */
                 val bootTimeMs =
                     System.currentTimeMillis() -
-                            android.os.SystemClock.elapsedRealtime()
+                        SystemClock.elapsedRealtime()
 
                 locationDataPoints.forEach { dataPoint ->
 
@@ -169,110 +144,30 @@ class LocationService : Service() {
 
                     val locationTimeMs =
                         bootTimeMs +
-                                dataPoint
-                                    .timeDurationFromBoot
-                                    .toMillis()
+                            dataPoint
+                                .timeDurationFromBoot
+                                .toMillis()
 
-                    /*
-                     * First GPS point.
-                     */
-                    if (lastLat == null ||
-                        lastLon == null ||
-                        lastLocationTimeMs == 0L
-                    ) {
-                        lastLat = lat
-                        lastLon = lon
-                        lastLocationTimeMs =
-                            locationTimeMs
-
-                        _speedKmh.value = 0.0
-
-                        writePoint(
-                            lat,
-                            lon,
-                            locationTimeMs
+                    val point =
+                        TrackPoint(
+                            latitude = lat,
+                            longitude = lon,
+                            timeMs = locationTimeMs
                         )
 
-                        return@forEach
-                    }
-
-                    /*
-                     * Calculate distance between GPS points.
-                     */
-                    val results =
-                        FloatArray(1)
-
-                    Location.distanceBetween(
-                        lastLat!!,
-                        lastLon!!,
-                        lat,
-                        lon,
-                        results
-                    )
-
-                    val distanceMeters =
-                        results[0]
-
-                    /*
-                     * Calculate speed.
-                     *
-                     * GPS distance is metres.
-                     * Time is seconds.
-                     * Result is converted to km/h.
-                     */
-                    val elapsedSeconds =
-                        (
-                                locationTimeMs -
-                                        lastLocationTimeMs
-                                ) / 1000.0
-
-                    val calculatedSpeedKmh =
-                        if (elapsedSeconds > 0.0) {
-                            distanceMeters /
-                                    elapsedSeconds *
-                                    3.6
-                        } else {
-                            0.0
-                        }
+                    val result =
+                        calculator.processPoint(point)
 
                     _speedKmh.value =
-                        calculatedSpeedKmh
+                        result.speedKmh
 
                     /*
-                     * -----------------------------------------------
-                     * ABOVE 7 KM/H / FILTERED PERIOD
-                     * -----------------------------------------------
-                     *
-                     * This reproduces the Ruby logic:
-                     *
-                     *   speed > 10 && speed < 30
-                     *
-                     *   abs(
-                     *       (nextSpeed - speed) /
-                     *       (nextTime - time)
-                     *   ) < 5
-                     *
-                     *   consecutive samples <= 6 seconds apart
-                     *
-                     *   total period > 20 seconds
+                     * Distance.
                      */
-
-                    processSpeedSample(
-                        locationTimeMs,
-                        calculatedSpeedKmh
-                    )
-
-                    /*
-                     * -----------------------------------------------
-                     * DISTANCE
-                     * -----------------------------------------------
-                     *
-                     * Ignore GPS movements smaller than 2 metres.
-                     */
-                    if (distanceMeters >= minMovementMeters) {
+                    if (result.acceptedForGpx) {
 
                         accumulatedDistance +=
-                            distanceMeters
+                            result.distanceMeters
 
                         _totalDistanceMeters.value =
                             accumulatedDistance
@@ -281,20 +176,22 @@ class LocationService : Service() {
                          * Write accepted point to GPX.
                          */
                         writePoint(
-                            lat,
-                            lon,
-                            locationTimeMs
+                            lat = lat,
+                            lon = lon,
+                            timeMs = locationTimeMs
                         )
-
-                        /*
-                         * Use this point as the reference for the
-                         * next distance/speed calculation.
-                         */
-                        lastLat = lat
-                        lastLon = lon
-                        lastLocationTimeMs =
-                            locationTimeMs
                     }
+
+                    /*
+                     * This is now the sole source of truth for the
+                     * run duration.
+                     */
+                    _runDurationSeconds.value =
+                        result.runDurationSeconds
+
+                    handleEvents(
+                        result.events
+                    )
                 }
             }
 
@@ -323,179 +220,6 @@ class LocationService : Service() {
             }
         }
 
-    /*
-     * Add a speed sample and update the detected period.
-     *
-     * The important difference from the old implementation is that
-     * crossing 7 km/h does NOT immediately start the timer.
-     *
-     * The timer only starts once we have a qualifying sequence.
-     */
-    private fun processSpeedSample(
-        timeMs: Long,
-        speedKmh: Double
-    ) {
-        /*
-         * The Ruby algorithm first removes speeds outside
-         * MIN_SPEED..MAX_SPEED.
-         */
-        if (speedKmh <= MIN_SPEED_KMH ||
-            speedKmh >= MAX_SPEED_KMH
-        ) {
-            finishCandidate(timeMs)
-            return
-        }
-
-        val sample =
-            SpeedSample(
-                timeMs,
-                speedKmh
-            )
-
-        /*
-         * If there is a previous sample, calculate acceleration.
-         */
-        val previous =
-            speedSamples.lastOrNull()
-
-        if (previous != null) {
-
-            val dt =
-                (timeMs - previous.timeMs) / 1000.0
-
-            if (dt <= 0.0) {
-                return
-            }
-
-            /*
-             * Equivalent to:
-             *
-             * ((nxt.speed - step.speed) /
-             *  (nxt.time - step.time)).abs < MAX_ACCEL
-             */
-            val acceleration =
-                (speedKmh - previous.speedKmh) / dt
-
-            if (kotlin.math.abs(acceleration) >=
-                MAX_ACCEL_MPS2
-            ) {
-                finishCandidate(timeMs)
-                speedSamples.clear()
-                speedSamples.addLast(sample)
-                return
-            }
-
-            /*
-             * Equivalent to chunk_while:
-             *
-             *   b.time - a.time <= MAX_TIME_STEP
-             */
-            if (dt > MAX_TIME_STEP_SECONDS) {
-                finishCandidate(timeMs)
-                speedSamples.clear()
-            }
-        }
-
-        speedSamples.addLast(sample)
-
-        /*
-         * We have a valid filtered sequence.
-         */
-        if (candidateStartMs == null) {
-            candidateStartMs = timeMs
-
-            /*
-             * Start beep only once the candidate eventually
-             * becomes a valid period. For now don't beep.
-             */
-        }
-
-        candidateLastMs = timeMs
-
-        val durationSeconds =
-            (
-                    candidateLastMs!! -
-                            candidateStartMs!!
-                    ) / 1000.0
-
-        /*
-         * Ruby:
-         *
-         *   .filter { |x|
-         *     x.last.time - x.first.time > MIN_TIME_S
-         *   }
-         */
-        if (durationSeconds > MIN_TIME_SECONDS) {
-
-            if (above7SinceMs == null) {
-
-                above7SinceMs =
-                    candidateStartMs
-
-                /*
-                 * START BEEP
-                 */
-                toneGenerator.startTone(
-                    ToneGenerator.TONE_PROP_BEEP,
-                    200
-                )
-
-                android.util.Log.d(
-                    "FoilTracker",
-                    "Started qualifying >7 km/h period"
-                )
-            }
-
-            _runDurationSeconds.value =
-                durationSeconds.toLong()
-        }
-    }
-
-    /*
-     * Finish the current candidate sequence.
-     */
-    private fun finishCandidate(
-        timeMs: Long
-    ) {
-        /*
-         * If we already have a qualifying period,
-         * publish its final duration.
-         */
-        above7SinceMs?.let { startMs ->
-
-            val endMs =
-                candidateLastMs ?: timeMs
-
-            val duration =
-                (
-                        endMs -
-                                startMs
-                        ) / 1000
-
-            /*
-             * STOP BEEP
-             */
-            toneGenerator.startTone(
-                ToneGenerator.TONE_PROP_BEEP2,
-                200
-            )
-
-            android.util.Log.d(
-                "FoilTracker",
-                "Ended >7 km/h period: ${duration}s"
-            )
-
-            _runDurationSeconds.value =
-                duration
-
-            above7SinceMs = null
-        }
-
-        candidateStartMs = null
-        candidateLastMs = null
-        speedSamples.clear()
-    }
-
     override fun onCreate() {
         super.onCreate()
 
@@ -521,6 +245,44 @@ class LocationService : Service() {
         }
 
         return START_NOT_STICKY
+    }
+
+    private fun handleEvents(
+        events: List<RunDurationEvent>
+    ) {
+
+        events.forEach { event ->
+
+            when (event) {
+
+                RunDurationEvent.QualifyingPeriodStarted -> {
+
+                    toneGenerator.startTone(
+                        ToneGenerator.TONE_PROP_BEEP,
+                        200
+                    )
+
+                    android.util.Log.d(
+                        "FoilTracker",
+                        "Started qualifying >7 km/h period"
+                    )
+                }
+
+                is RunDurationEvent.QualifyingPeriodEnded -> {
+
+                    toneGenerator.startTone(
+                        ToneGenerator.TONE_PROP_BEEP2,
+                        200
+                    )
+
+                    android.util.Log.d(
+                        "FoilTracker",
+                        "Ended >7 km/h period: " +
+                            "${event.durationSeconds}s"
+                    )
+                }
+            }
+        }
     }
 
     private fun startServiceForeground() {
@@ -551,22 +313,25 @@ class LocationService : Service() {
          * Reset session.
          */
         _recording.value = true
+
         accumulatedDistance = 0f
 
-        _totalDistanceMeters.value = 0f
+        _totalDistanceMeters.value =
+            0f
 
-        _speedKmh.value = 0.0
+        _speedKmh.value =
+            0.0
 
-        _runDurationSeconds.value = 0L
+        _runDurationSeconds.value =
+            0L
 
-        above7SinceMs = null
-        candidateStartMs = null
-        candidateLastMs = null
-        speedSamples.clear()
-
-        lastLat = null
-        lastLon = null
-        lastLocationTimeMs = 0L
+        /*
+         * Create a NEW calculator for every recording.
+         *
+         * This is important because RunDurationCalculator is a
+         * state machine.
+         */
+        resetCalculator()
 
         createGpxFile()
 
@@ -618,6 +383,17 @@ class LocationService : Service() {
         }
     }
 
+    private fun resetCalculator() {
+        calculator = RunDurationCalculator()
+        /*
+         * RunDurationCalculator intentionally has no reset()
+         * method. Creating one per recording makes its lifecycle
+         * explicit and avoids accidentally retaining GPS state.
+         *
+         * The property itself therefore needs to be replaceable.
+         */
+    }
+
     private fun stopTracking() {
 
         _recording.value = false
@@ -641,9 +417,15 @@ class LocationService : Service() {
             /*
              * Finish any pending qualifying period.
              */
-            finishCandidate(
-                System.currentTimeMillis()
-            )
+            val events =
+                calculator.finish(
+                    System.currentTimeMillis()
+                )
+
+            handleEvents(events)
+
+            _runDurationSeconds.value =
+                calculator.currentRunDurationSeconds
 
             closeGpxFile()
 
@@ -653,6 +435,18 @@ class LocationService : Service() {
 
             stopSelf()
         }
+    }
+
+    private fun getCurrentRunDuration(): Long {
+        /*
+         * The calculator's processPoint() results are the public
+         * state used during recording. At this point there is no
+         * new point to process, so this method is only needed if
+         * finish() ended an active period.
+         *
+         * The service can instead retain the last value.
+         */
+        return _runDurationSeconds.value
     }
 
     private fun createGpxFile() {
@@ -746,8 +540,8 @@ class LocationService : Service() {
 
             gpxWriter?.write(
                 "\n        </trkseg>\n" +
-                        "    </trk>\n" +
-                        "</gpx>"
+                    "    </trk>\n" +
+                    "</gpx>"
             )
 
             gpxWriter?.flush()
