@@ -79,7 +79,7 @@ ranges = steps
   .chunk_while { |a, b| b.time - a.time <= MAX_TIME_STEP }
   .filter { |x| x.last.time - x.first.time > MIN_TIME_S }
 
-ranges.each { |x| puts "#{sec_to_s(x.first.time)} -> #{sec_to_s(x.last.time)}\t#{sec_to_s(x.last.time - x.first.time)}" }
+ranges.each { |x| puts "-> #{sec_to_s(x.last.time)}\t#{sec_to_s(x.last.time - x.first.time)}" }
 
 File.open("/tmp/speed.dat", "w") do |f|
   steps.each do |s|

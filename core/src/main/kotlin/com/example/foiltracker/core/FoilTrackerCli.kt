@@ -15,6 +15,17 @@ private fun formatDuration(
     val remainingSeconds =
         seconds % 60
 
+    if(minutes > 59) {
+        val hours = minutes / 60
+        val minutes2 = minutes % 60
+        return String.format(
+            "%02d:%02d:%02d",
+            hours,
+            minutes2,
+            remainingSeconds
+        )
+    }
+
     return String.format(
         "%02d:%02d",
         minutes,
@@ -58,6 +69,8 @@ fun main(
         DateTimeFormatter.ISO_INSTANT
             .withZone(ZoneOffset.UTC)
 
+    val startTimeMs = points.first().timeMs
+
     points.forEachIndexed { index, point ->
 
         val result =
@@ -72,6 +85,7 @@ fun main(
 
         println(
             "point=${index + 1} " +
+            "reltime=${formatDuration((point.timeMs - startTimeMs)/1000)} " +
                 "time=$time " +
                 "lat=${point.latitude} " +
                 "lon=${point.longitude} " +
