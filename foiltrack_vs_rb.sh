@@ -1,1 +1,1 @@
-paste -d '|' <(./speed_from_gpx.rb "$1") <(./foiltrack_from_gpx.sh "$1") | sed 's/|/  |  /'
+paste -d '|' <(./speed_from_gpx.rb "$1" | column -t) <(./foiltrack_from_gpx.sh "$1" | column -t) | sed 's/|/  |  /'
