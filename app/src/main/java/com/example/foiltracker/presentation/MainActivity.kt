@@ -120,7 +120,8 @@ class MainActivity : ComponentActivity() {
             mutableListOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACTIVITY_RECOGNITION
+                Manifest.permission.ACTIVITY_RECOGNITION,
+                "android.permission.health.READ_HEART_RATE"
             )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -203,6 +204,10 @@ class MainActivity : ComponentActivity() {
         LocationService.runDurationSeconds
             .collectAsState()
 
+        val heartRateBpm by
+        LocationService.heartRateBpm
+            .collectAsState()
+
         val recording by
         LocationService.recording
             .collectAsState()
@@ -265,12 +270,14 @@ class MainActivity : ComponentActivity() {
                 )
 
                 Text(
-                    text = "FoilTracker"
+                    text = heartRateBpm?.let {
+                        "♥ ${it.toInt()} bpm"
+                    } ?: "♥ -- bpm"
                 )
 
                 Text(
                     text =
-                        "Build: ${BuildConfig.BUILD_DATE}"
+                        "FoilTracker: ${BuildConfig.BUILD_DATE}"
                 )
 
                 Button(
