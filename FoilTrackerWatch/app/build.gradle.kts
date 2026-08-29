@@ -75,6 +75,8 @@ dependencies {
     // Futures pour simplifier les appels asynchrones avec Kotlin
     implementation("androidx.concurrent:concurrent-futures-ktx:1.1.0")
 
+    implementation("com.google.android.gms:play-services-wearable:19.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 
         implementation("androidx.activity:activity-compose:1.10.1")
         implementation("androidx.compose.ui:ui")

@@ -22,6 +22,7 @@ import androidx.health.services.client.data.ExerciseConfig
 import androidx.health.services.client.data.ExerciseLapSummary
 import androidx.health.services.client.data.ExerciseType
 import androidx.health.services.client.data.ExerciseUpdate
+import com.example.foiltracker.sync.WearFileSender
 
 import com.example.foiltracker.core.RunDurationEvent
 import com.example.foiltracker.core.RunDurationCalculator
@@ -42,7 +43,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
-
 
 class LocationService : Service() {
 
@@ -640,7 +640,17 @@ class LocationService : Service() {
                 calculator.currentRunDurationSeconds
 
 
-            closeGpxFile()
+            val completedFile =
+                closeGpxFile()
+
+            if (completedFile != null) {
+
+                WearFileSender.logConnectedNodes(context = this@LocationService)
+                WearFileSender.sendFile(
+                    context = this@LocationService,
+                    file = completedFile
+                )
+            }
 
 
             stopForeground(
@@ -768,7 +778,7 @@ class LocationService : Service() {
     }
 
 
-    private fun closeGpxFile() {
+    private fun closeGpxFile() : File? {
 
         try {
 
@@ -786,12 +796,14 @@ class LocationService : Service() {
         } catch (_: Exception) {
         }
 
+        gpxWriter = null
 
-        gpxWriter =
-            null
+        val completedFile =
+            currentFile
 
-        currentFile =
-            null
+        currentFile = null
+
+        return completedFile
     }
 
 
