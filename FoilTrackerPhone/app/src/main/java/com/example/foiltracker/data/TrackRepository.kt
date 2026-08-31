@@ -1,6 +1,7 @@
 package com.example.foiltracker.data
 
 import android.content.Context
+import com.example.foiltracker.sync.WearFileSync
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
@@ -13,12 +14,10 @@ class TrackRepository(
         Flow<List<TrackFile>> =
         dao.observeAll()
 
-
     suspend fun findBySyncId(
         syncId: String
     ): TrackFile? =
         dao.findBySyncId(syncId)
-
 
     suspend fun addTrack(
         syncId: String,
@@ -36,10 +35,8 @@ class TrackRepository(
 
         tracksDirectory.mkdirs()
 
-
         val safeFilename =
             File(filename).name
-
 
         val destination =
             File(
@@ -47,13 +44,11 @@ class TrackRepository(
                 safeFilename
             )
 
-
         val temporary =
             File(
                 tracksDirectory,
                 ".$safeFilename.tmp"
             )
-
 
         sourceFile.inputStream().use { input ->
 
@@ -65,7 +60,6 @@ class TrackRepository(
                 )
             }
         }
-
 
         if (
             !temporary.exists() ||
@@ -79,11 +73,9 @@ class TrackRepository(
             )
         }
 
-
         if (destination.exists()) {
             destination.delete()
         }
-
 
         if (
             !temporary.renameTo(destination)
@@ -95,7 +87,6 @@ class TrackRepository(
                 "Unable to finalize file"
             )
         }
-
 
         val track =
             TrackFile(
@@ -110,23 +101,42 @@ class TrackRepository(
                     destination.absolutePath
             )
 
-
         dao.insert(track)
 
         return track
     }
 
-
     suspend fun delete(
         track: TrackFile
     ) {
 
-        File(
-            track.localPath
-        ).delete()
-
-        dao.delete(
-            track.syncId
+        // Tell watch to delete its local file.
+        WearFileSync.sendDeleteCommand(
+            context = context,
+            filename = track.filename
         )
+
+        // Delete the original Wear DataItem.
+        WearFileSync.deleteFileDataItem(
+            context = context,
+            syncId = track.syncId
+        )
+
+        // Delete phone file.
+        File(track.localPath).delete()
+
+        // Delete phone database entry.
+        dao.delete(track.syncId)
+    }
+
+    suspend fun deleteAll() {
+
+        val tracks =
+            dao.getAll()
+
+        for (track in tracks) {
+
+            delete(track)
+        }
     }
 }

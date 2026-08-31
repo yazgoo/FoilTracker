@@ -39,6 +39,22 @@
         </activity>
 
         <service
+            android:name=".sync.WearDeleteReceiverService"
+            android:exported="true">
+
+        <intent-filter>
+
+            <action
+                android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+
+            <data
+                android:scheme="wear"
+                android:pathPrefix="/foiltracker/delete" />
+
+        </intent-filter>
+
+    </service>
+        <service
             android:name=".LocationService"
             android:foregroundServiceType="location|health"
             android:exported="false" />

@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrackFileDao {
+    @Query("SELECT * FROM track_files")
+    suspend fun getAll(): List<TrackFile>
 
     @Query(
         """

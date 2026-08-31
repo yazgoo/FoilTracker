@@ -8,6 +8,9 @@ import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.tasks.await
 import java.io.File
+import com.google.android.gms.wearable.PutDataMapRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object WearFileSync {
 
@@ -19,6 +22,90 @@ object WearFileSync {
 
     private const val ASSET_KEY =
         "file"
+
+    suspend fun deleteFileDataItem(
+        context: Context,
+        syncId: String
+    ) = withContext(Dispatchers.IO) {
+
+        try {
+
+            val uri =
+                android.net.Uri.parse(syncId)
+
+            Wearable
+                .getDataClient(context)
+                .deleteDataItems(uri)
+                .await()
+
+            Log.i(
+                TAG,
+                "Deleted Wear DataItem: $syncId"
+            )
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "Failed deleting Wear DataItem: $syncId",
+                e
+            )
+        }
+    }
+    suspend fun sendDeleteCommand(
+        context: Context,
+        filename: String
+    ) = withContext(Dispatchers.IO) {
+
+        val safeFilename = File(filename).name
+
+        val path =
+            "/foiltracker/delete/$safeFilename"
+
+        try {
+
+            val request =
+                PutDataMapRequest
+                    .create(path)
+                    .apply {
+
+                        dataMap.putString(
+                            "operation",
+                            "delete"
+                        )
+
+                        dataMap.putString(
+                            "filename",
+                            safeFilename
+                        )
+
+                        dataMap.putLong(
+                            "timestamp",
+                            System.currentTimeMillis()
+                        )
+                    }
+                    .asPutDataRequest()
+                    .setUrgent()
+
+            Wearable
+                .getDataClient(context)
+                .putDataItem(request)
+                .await()
+
+            Log.i(
+                "FoilTrackerSync",
+                "DELETE sent to watch: $safeFilename"
+            )
+
+        } catch (e: Exception) {
+
+            Log.e(
+                "FoilTrackerSync",
+                "Failed to send DELETE: $safeFilename",
+                e
+            )
+        }
+    }
 
     suspend fun sync(
         context: Context
