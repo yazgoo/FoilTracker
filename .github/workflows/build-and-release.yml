@@ -3,7 +3,7 @@ name: Build and Release APKs
 on:
   push:
     tags:
-      - 'v*' # Triggers on any tag starting with 'v', e.g., v1.0.0
+      - 'v*'
 
 jobs:
   build:
@@ -17,26 +17,22 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
-          cache: 'gradle'
+          cache: gradle
 
-      - name: Grant execute permission for gradlew
+      - name: Grant execute permission
         run: |
-          chmod +x FoilTrackerWatch/gradlew
           chmod +x FoilTrackerPhone/gradlew
+          chmod +x FoilTrackerWatch/gradlew
 
-      - name: Build Phone APK (Debug/Release)
-        run: |
-          cd FoilTrackerPhone
-          # Change to assembleRelease if you have signing keys set up
-          ./gradlew assembleDebug
+      - name: Build Phone APK
+        working-directory: FoilTrackerPhone
+        run: ./gradlew assembleDebug
 
-      - name: Build Watch APK (Debug/Release)
-        run: |
-          cd FoilTrackerWatch
-          # Change to assembleRelease if you have signing keys set up
-          ./gradlew assembleDebug
+      - name: Build Watch APK
+        working-directory: FoilTrackerWatch
+        run: ./gradlew assembleDebug
 
       - name: Upload Phone APK Artifact
         uses: actions/upload-artifact@v4
@@ -54,6 +50,7 @@ jobs:
     name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
 
@@ -62,24 +59,23 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: phone-apk
-          path: ./apks
+          path: ./apks/phone
 
       - name: Download Watch APK
         uses: actions/download-artifact@v4
         with:
           name: watch-apk
-          path: ./apks
+          path: ./apks/watch
 
-      - name: Rename APKs for clarity
+      - name: Rename APKs
         run: |
-          mv ./apks/app-debug.apk ./apks/FoilTrackerPhone-debug.apk
-          # If the watch module output has the same filename, rename it to prevent overwriting
-          # Adjust path if your watch module outputs to a different folder structure
-          find ./apks -name "app-debug.apk" -exec mv {} ./apks/FoilTrackerWatch-debug.apk \;
+          mv ./apks/phone/app-debug.apk ./apks/FoilTrackerPhone-debug.apk
+          mv ./apks/watch/app-debug.apk ./apks/FoilTrackerWatch-debug.apk
 
-      - name: Create Release and Upload APKs
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./apks/*.apk
+            ./apks/FoilTrackerPhone-debug.apk
+            ./apks/FoilTrackerWatch-debug.apk
           generate_release_notes: true
