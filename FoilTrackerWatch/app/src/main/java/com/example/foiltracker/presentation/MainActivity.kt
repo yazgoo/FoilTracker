@@ -16,8 +16,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -26,7 +30,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.wear.ambient.AmbientLifecycleObserver
 
+import kotlinx.coroutines.delay
+
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
+
 
 class MainActivity : ComponentActivity() {
 
@@ -44,12 +53,7 @@ class MainActivity : ComponentActivity() {
                 ambientDetails:
                 AmbientLifecycleObserver.AmbientDetails
             ) {
-                /*
-                 * The Activity remains in the foreground.
-                 *
-                 * FLAG_KEEP_SCREEN_ON prevents the normal
-                 * screen timeout while tracking.
-                 */
+                // Keep current behaviour.
             }
 
             override fun onExitAmbient() {
@@ -57,7 +61,7 @@ class MainActivity : ComponentActivity() {
             }
 
             override fun onUpdateAmbient() {
-                // Called when the ambient display should update.
+                // Called when ambient display should update.
             }
         }
 
@@ -66,17 +70,10 @@ class MainActivity : ComponentActivity() {
     ) {
         super.onCreate(savedInstanceState)
 
-        /*
-         * If tracking was already active when Android recreated
-         * the Activity, keep the screen awake.
-         */
         if (LocationService.recording.value) {
             setKeepScreenOn(true)
         }
 
-        /*
-         * Enable Wear OS ambient mode support.
-         */
         ambientObserver =
             AmbientLifecycleObserver(
                 this,
@@ -94,9 +91,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /*
-     * Keep the watch display awake while tracking.
-     */
     private fun setKeepScreenOn(
         enabled: Boolean
     ) {
@@ -152,9 +146,6 @@ class MainActivity : ComponentActivity() {
 
     private fun startTracking() {
 
-        /*
-         * Prevent the display from turning off while tracking.
-         */
         setKeepScreenOn(true)
 
         val intent =
@@ -173,9 +164,6 @@ class MainActivity : ComponentActivity() {
 
     private fun stopTracking() {
 
-        /*
-         * Allow the normal screen timeout again.
-         */
         setKeepScreenOn(false)
 
         val intent =
@@ -212,6 +200,38 @@ class MainActivity : ComponentActivity() {
         LocationService.recording
             .collectAsState()
 
+        /*
+         * ---------------------------------------------------------
+         * CURRENT TIME
+         * ---------------------------------------------------------
+         */
+
+        var currentTime by remember {
+
+            mutableStateOf(
+                LocalTime.now().format(
+                    DateTimeFormatter.ofPattern(
+                        "HH:mm"
+                    )
+                )
+            )
+        }
+
+        LaunchedEffect(Unit) {
+
+            while (true) {
+
+                currentTime =
+                    LocalTime.now().format(
+                        DateTimeFormatter.ofPattern(
+                            "HH:mm"
+                        )
+                    )
+
+                delay(10000)
+            }
+        }
+
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -224,6 +244,14 @@ class MainActivity : ComponentActivity() {
                 verticalArrangement =
                     Arrangement.SpaceEvenly
             ) {
+
+                /*
+                 * CLOCK
+                 */
+                Text(
+                    text = currentTime,
+                    fontWeight = FontWeight.Bold
+                )
 
                 /*
                  * DISTANCE
@@ -252,7 +280,7 @@ class MainActivity : ComponentActivity() {
                 Text(
                     text = String.format(
                         Locale.US,
-                        "Speed: %.1f km/h",
+                        "%.1f km/h",
                         speedKmh
                     )
                 )
@@ -269,10 +297,13 @@ class MainActivity : ComponentActivity() {
                     fontWeight = FontWeight.Bold
                 )
 
+                /*
+                 * HEART RATE
+                 */
                 Text(
                     text = heartRateBpm?.let {
-                        "♥ ${it.toInt()} bpm"
-                    } ?: "♥ -- bpm"
+                        "${it.toInt()} bpm"
+                    } ?: "-- bpm"
                 )
 
                 Text(

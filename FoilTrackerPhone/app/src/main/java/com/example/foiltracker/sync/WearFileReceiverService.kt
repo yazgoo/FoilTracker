@@ -1,249 +1,99 @@
 package com.example.foiltracker.sync
 
-import android.content.Context
 import android.util.Log
-import com.example.foiltracker.FoilTrackerApplication
-import com.google.android.gms.wearable.DataItem
-import com.google.android.gms.wearable.DataMapItem
-import com.google.android.gms.wearable.Wearable
+import com.google.android.gms.wearable.DataEvent
+import com.google.android.gms.wearable.DataEventBuffer
+import com.google.android.gms.wearable.WearableListenerService
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
-import java.io.File
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
-object WearFileSync {
+class WearFileReceiverService :
+    WearableListenerService() {
 
-    private const val TAG =
-        "FoilTrackerSync"
+    companion object {
+        private const val TAG = "FoilTrackerSync"
+    }
 
-    private const val PATH_PREFIX =
-        "/foiltracker/file/"
+    private val scope =
+        CoroutineScope(
+            SupervisorJob() +
+                Dispatchers.IO
+        )
 
-    private const val ASSET_KEY =
-        "file"
-
-    suspend fun sync(
-        context: Context
-    ) = withContext(Dispatchers.IO) {
+    override fun onCreate() {
+        super.onCreate()
 
         Log.i(
             TAG,
-            "Starting Data Layer sync"
+            "WearFileReceiverService CREATED"
+        )
+    }
+
+    override fun onDataChanged(
+        events: DataEventBuffer
+    ) {
+        Log.i(
+            TAG,
+            "onDataChanged: ${events.count} events"
         )
 
-        try {
+        for (event in events) {
 
-            val application =
-                context.applicationContext
-                    as FoilTrackerApplication
+            if (
+                event.type !=
+                DataEvent.TYPE_CHANGED
+            ) {
+                continue
+            }
 
-            val dataItems =
-                Wearable
-                    .getDataClient(context)
-                    .dataItems
-                    .await()
+            val path =
+                event.dataItem.uri.path
+                    ?: continue
+
+            if (
+                !path.startsWith(
+                    "/foiltracker/file/"
+                )
+            ) {
+                continue
+            }
 
             Log.i(
                 TAG,
-                "Found ${dataItems.count} DataItems"
+                "GPX DataItem received: $path"
             )
 
-            for (item in dataItems) {
+            val dataItem =
+                event.dataItem.freeze()
+
+            scope.launch {
 
                 try {
 
-                    processItem(
-                        context,
-                        application,
-                        item
+                    WearFileSync.process(
+                        applicationContext,
+                        dataItem
                     )
 
                 } catch (e: Exception) {
 
                     Log.e(
                         TAG,
-                        "Failed processing ${item.uri}",
+                        "Failed importing $path",
                         e
                     )
                 }
             }
-
-            dataItems.release()
-
-            Log.i(
-                TAG,
-                "Data Layer sync complete"
-            )
-
-        } catch (e: Exception) {
-
-            Log.e(
-                TAG,
-                "Data Layer sync failed",
-                e
-            )
         }
     }
 
-    private suspend fun processItem(
-        context: Context,
-        application: FoilTrackerApplication,
-        dataItem: DataItem
-    ) {
+    override fun onDestroy() {
 
-        val path =
-            dataItem.uri.path
-                ?: return
+        scope.cancel()
 
-        if (
-            !path.startsWith(
-                PATH_PREFIX
-            )
-        ) {
-            return
-        }
-
-        val syncId =
-            dataItem.uri.toString()
-
-        /*
-         * Already imported?
-         */
-        if (
-            application.repository
-                .findBySyncId(syncId)
-                != null
-        ) {
-
-            Log.d(
-                TAG,
-                "Already imported: $syncId"
-            )
-
-            return
-        }
-
-        val dataMap =
-            DataMapItem
-                .fromDataItem(dataItem)
-                .dataMap
-
-        val filename =
-            dataMap.getString(
-                "filename"
-            )
-                ?: File(path).name
-
-        val modifiedTime =
-            dataMap.getLong(
-                "modified",
-                System.currentTimeMillis()
-            )
-
-        val mimeType =
-            dataMap.getString(
-                "mime_type"
-            )
-                ?: "application/gpx+xml"
-
-        val asset =
-            dataMap.getAsset(
-                ASSET_KEY
-            )
-                ?: throw IllegalStateException(
-                    "Missing Asset"
-                )
-
-        val tempDir =
-            File(
-                context.cacheDir,
-                "wear_assets"
-            )
-
-        if (!tempDir.exists()) {
-            tempDir.mkdirs()
-        }
-
-        val tempFile =
-            File(
-                tempDir,
-                "${System.nanoTime()}.gpx"
-            )
-
-        try {
-
-            /*
-             * Download Asset.
-             */
-            val response =
-                Wearable
-                    .getDataClient(context)
-                    .getFdForAsset(asset)
-                    .await()
-
-            try {
-
-                val input =
-                    response.getInputStream()
-
-                input.use { stream ->
-
-                    tempFile.outputStream()
-                        .use { output ->
-
-                        stream.copyTo(
-                            output,
-                            64 * 1024
-                        )
-                    }
-                }
-
-            } finally {
-
-                response.release()
-            }
-
-            if (
-                !tempFile.exists() ||
-                tempFile.length() == 0L
-            ) {
-
-                throw IllegalStateException(
-                    "Downloaded file is empty"
-                )
-            }
-
-            /*
-             * Store permanently.
-             */
-            application.repository.addTrack(
-
-                syncId =
-                    syncId,
-
-                filename =
-                    filename,
-
-                sourceFile =
-                    tempFile,
-
-                modifiedTime =
-                    modifiedTime,
-
-                mimeType =
-                    mimeType
-            )
-
-            Log.i(
-                TAG,
-                "IMPORTED GPX: " +
-                    "$filename " +
-                    "(${tempFile.length()} bytes)"
-            )
-
-        } finally {
-
-            tempFile.delete()
-        }
+        super.onDestroy()
     }
 }

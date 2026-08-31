@@ -7,6 +7,7 @@
         android:name=".FoilTrackerApplication"
         android:allowBackup="true"
         android:label="@string/app_name"
+        android:icon="@drawable/piouz_logo"
         android:supportsRtl="true">
 
         <activity
