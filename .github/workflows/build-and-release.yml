@@ -10,8 +10,40 @@ permissions:
 
 jobs:
   build:
-    name: Build Signed AABs + APKs
+    name: Build ${{ matrix.name }} ${{ matrix.type }}
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Phone
+            project: FoilTrackerPhone
+            type: AAB
+            task: bundleRelease
+            output: app/build/outputs/bundle/release/app-release.aab
+            artifact: FoilTrackerPhone-aab
+
+          - name: Phone
+            project: FoilTrackerPhone
+            type: APK
+            task: assembleRelease
+            output: app/build/outputs/apk/release/app-release.apk
+            artifact: FoilTrackerPhone-apk
+
+          - name: Watch
+            project: FoilTrackerWatch
+            type: AAB
+            task: bundleRelease
+            output: app/build/outputs/bundle/release/app-release.aab
+            artifact: FoilTrackerWatch-aab
+
+          - name: Watch
+            project: FoilTrackerWatch
+            type: APK
+            task: assembleRelease
+            output: app/build/outputs/apk/release/app-release.apk
+            artifact: FoilTrackerWatch-apk
 
     steps:
       - name: Checkout Repository
@@ -25,9 +57,7 @@ jobs:
           cache: gradle
 
       - name: Grant execute permission
-        run: |
-          chmod +x FoilTrackerPhone/gradlew
-          chmod +x FoilTrackerWatch/gradlew
+        run: chmod +x ${{ matrix.project }}/gradlew
 
       # ----------------------------------------
       # Signing
@@ -37,86 +67,39 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 --decode > FoilTrackerPhone/app/upload-keystore.jks
-          echo "$KEYSTORE_BASE64" | base64 --decode > FoilTrackerWatch/app/upload-keystore.jks
+          echo "$KEYSTORE_BASE64" | base64 --decode \
+            > ${{ matrix.project }}/app/upload-keystore.jks
 
       # ----------------------------------------
-      # Phone
+      # Build
       # ----------------------------------------
 
-      - name: Build Phone Release AAB
-        working-directory: FoilTrackerPhone
+      - name: Build ${{ matrix.type }}
+        working-directory: ${{ matrix.project }}
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: ./gradlew bundleRelease
-
-      - name: Build Phone Release APK
-        working-directory: FoilTrackerPhone
-        env:
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
+        run: ./gradlew ${{ matrix.task }}
 
       # ----------------------------------------
-      # Watch
+      # Upload artifact
       # ----------------------------------------
 
-      - name: Build Watch Release AAB
-        working-directory: FoilTrackerWatch
-        env:
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: ./gradlew bundleRelease
-
-      - name: Build Watch Release APK
-        working-directory: FoilTrackerWatch
-        env:
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
-
-      # ----------------------------------------
-      # Upload build artifacts
-      # ----------------------------------------
-
-      - name: Upload Phone AAB
+      - name: Upload ${{ matrix.type }}
         uses: actions/upload-artifact@v4
         with:
-          name: FoilTrackerPhone-aab
-          path: FoilTrackerPhone/app/build/outputs/bundle/release/app-release.aab
-
-      - name: Upload Phone APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: FoilTrackerPhone-apk
-          path: FoilTrackerPhone/app/build/outputs/apk/release/app-release.apk
-
-      - name: Upload Watch AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: FoilTrackerWatch-aab
-          path: FoilTrackerWatch/app/build/outputs/bundle/release/app-release.aab
-
-      - name: Upload Watch APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: FoilTrackerWatch-apk
-          path: FoilTrackerWatch/app/build/outputs/apk/release/app-release.apk
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.project }}/${{ matrix.output }}
 
       # ----------------------------------------
-      # Clean signing files
+      # Clean signing file
       # ----------------------------------------
 
-      - name: Remove signing keystores
+      - name: Remove signing keystore
         if: always()
         run: |
-          rm -f FoilTrackerPhone/app/upload-keystore.jks
-          rm -f FoilTrackerWatch/app/upload-keystore.jks
+          rm -f ${{ matrix.project }}/app/upload-keystore.jks
 
   release:
     name: Create GitHub Release
@@ -153,7 +136,7 @@ jobs:
           path: ./release/watch-apk
 
       # ----------------------------------------
-      # Rename files
+      # Rename
       # ----------------------------------------
 
       - name: Rename release files
