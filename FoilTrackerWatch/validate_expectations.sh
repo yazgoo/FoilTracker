@@ -2,7 +2,7 @@
 for f in fixtures/*.gpx
 do 
     echo "$f ⏳"
-    diff <(./foiltrack_vs_rb.sh $PWD/"$f") expectations/$(basename "$f").expected || exit 1
+    diff expectations/$(basename "$f").expected <(./foiltrack_vs_rb.sh $PWD/"$f") || exit 1
     echo "$f ✅"
 done
 

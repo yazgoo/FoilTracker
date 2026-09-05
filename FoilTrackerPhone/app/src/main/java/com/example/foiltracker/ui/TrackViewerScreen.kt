@@ -17,8 +17,6 @@ import com.example.foiltracker.sharing.FileSharing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import java.time.Instant
 import androidx.compose.ui.unit.sp
 
@@ -69,53 +67,21 @@ fun TrackViewerScreen(
 
     LaunchedEffect(track.localPath) {
 
-        var previousRunDurationSeconds = 0L
-
         text =
             withContext(Dispatchers.IO) {
 
+                var content = ""
                 try {
 
                     val file = File(track.localPath)
-                    val points = GpxTrackReader.read(file)
-
-                    val calculator = RunDurationCalculator()
-
-                    val formatter =
-                        DateTimeFormatter.ISO_INSTANT
-                            .withZone(ZoneOffset.UTC)
-
-                    val startTimeMs = points.first().timeMs
-
-                    var last = "";
-                    points.forEachIndexed { index, point ->
-
-                        val result =
-                            calculator.processPoint(point)
-
-                        val time =
-                            formatter.format(
-                                Instant.ofEpochMilli(
-                                    point.timeMs
-                                )
-                            )
-
-                        if(result.runDurationSeconds < previousRunDurationSeconds || index + 1 == points.size) {
-                            last += "\n\n" +
-                            "${formatDuration((point.timeMs - startTimeMs)/1000)} -> " +
-                            "${formatDuration(previousRunDurationSeconds)}"
-                        }
-
-                        previousRunDurationSeconds = result.runDurationSeconds
-                    }
-
-                    last
+                    content += FoilTrackerReporter().getReportString(file, false)
                 } catch (exception: Exception) {
 
                     "Unable to read GPX:\n\n" +
                         exception.message + "\n\n" +
                         exception.stackTraceToString()
                 }
+                content
             }
     }
 

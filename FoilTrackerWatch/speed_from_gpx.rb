@@ -70,12 +70,12 @@ end
 MIN_SPEED = 10
 MAX_SPEED = 30
 MAX_TIME_STEP = 6
-MAX_ACCEL = 5
+# MAX_ACCEL = 5
 MIN_TIME_S = 20
 
 ranges = steps
   .filter { |s| MIN_SPEED < s.speed and s.speed < MAX_SPEED }
-  .each_cons(2).filter_map { |step, nxt| step if ((nxt.speed - step.speed)/(nxt.time - step.time)).abs < MAX_ACCEL  }
+  #.each_cons(2).filter_map { |step, nxt| step if ((nxt.speed - step.speed)/(nxt.time - step.time)).abs < MAX_ACCEL  }
   .chunk_while { |a, b| b.time - a.time <= MAX_TIME_STEP }
   .filter { |x| x.last.time - x.first.time > MIN_TIME_S }
 
