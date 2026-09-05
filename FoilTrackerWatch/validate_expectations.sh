@@ -1,4 +1,4 @@
-#!/bin/env sh
+#!/bin/env bash
 for f in fixtures/*.gpx
 do 
     echo "$f ⏳"
