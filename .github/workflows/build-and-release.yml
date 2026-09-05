@@ -2,6 +2,8 @@ name: Build and Release AABs + APKs
 
 on:
   push:
+    branches:
+      - '**'
     tags:
       - 'v*'
 
@@ -9,8 +11,66 @@ permissions:
   contents: write
 
 jobs:
+  # ========================================
+  # GPX validation
+  # Runs on every push
+  # ========================================
+
+  test:
+    name: Validate FoilTracker GPX expectations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Grant execute permission
+        run: |
+          chmod +x FoilTrackerWatch/gradlew
+          chmod +x FoilTrackerWatch/validate_expectations.sh
+          chmod +x FoilTrackerWatch/foiltrack_vs_rb.sh
+          chmod +x FoilTrackerWatch/foiltrack_from_gpx.sh
+          chmod +x FoilTrackerWatch/speed_from_gpx.rb
+          chmod +x FoilTrackerWatch/anonimize_foiltrack.rb
+
+      # ----------------------------------------
+      # Ruby / GPX validation dependencies
+      # ----------------------------------------
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
+      - name: Install GPX validation dependencies
+        run: gem install nokogiri
+
+      # ----------------------------------------
+      # Run expectations
+      # ----------------------------------------
+
+      - name: Validate FoilTracker expectations
+        working-directory: FoilTrackerWatch
+        shell: bash
+        run: ./validate_expectations.sh
+
+
+  # ========================================
+  # Build signed AABs + APKs
+  # Only runs for v* tags
+  # ========================================
+
   build:
     name: Build ${{ matrix.name }} ${{ matrix.type }}
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
 
     strategy:
@@ -60,20 +120,6 @@ jobs:
         run: chmod +x ${{ matrix.project }}/gradlew
 
       # ----------------------------------------
-      # Ruby / GPX validation dependencies
-      # ----------------------------------------
-
-      - name: Set up Ruby
-        if: matrix.project == 'FoilTrackerWatch'
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
-
-      - name: Install GPX validation dependencies
-        if: matrix.project == 'FoilTrackerWatch'
-        run: gem install nokogiri
-
-      # ----------------------------------------
       # Signing
       # ----------------------------------------
 
@@ -83,16 +129,6 @@ jobs:
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode \
             > ${{ matrix.project }}/app/upload-keystore.jks
-
-      # ----------------------------------------
-      # Watch GPX expectations
-      # ----------------------------------------
-
-      - name: Validate FoilTracker expectations
-        if: matrix.project == 'FoilTrackerWatch'
-        working-directory: FoilTrackerWatch
-        shell: bash
-        run: ./validate_expectations.sh
 
       # ----------------------------------------
       # Build
@@ -125,9 +161,16 @@ jobs:
         run: |
           rm -f ${{ matrix.project }}/app/upload-keystore.jks
 
+
+  # ========================================
+  # GitHub Release
+  # Only runs for v* tags
+  # ========================================
+
   release:
     name: Create GitHub Release
     needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
 
     steps:
