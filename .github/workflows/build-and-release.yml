@@ -1,4 +1,4 @@
-name: Build and Release AABs
+name: Build and Release AABs + APKs
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Signed AABs
+    name: Build Signed AABs + APKs
     runs-on: ubuntu-latest
 
     steps:
@@ -44,7 +44,7 @@ jobs:
       # Phone
       # ----------------------------------------
 
-      - name: Build Phone AAB
+      - name: Build Phone Release AAB
         working-directory: FoilTrackerPhone
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -52,17 +52,33 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: ./gradlew bundleRelease
 
+      - name: Build Phone Release APK
+        working-directory: FoilTrackerPhone
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew assembleRelease
+
       # ----------------------------------------
       # Watch
       # ----------------------------------------
 
-      - name: Build Watch AAB
+      - name: Build Watch Release AAB
         working-directory: FoilTrackerWatch
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: ./gradlew bundleRelease
+
+      - name: Build Watch Release APK
+        working-directory: FoilTrackerWatch
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew assembleRelease
 
       # ----------------------------------------
       # Upload build artifacts
@@ -74,11 +90,23 @@ jobs:
           name: FoilTrackerPhone-aab
           path: FoilTrackerPhone/app/build/outputs/bundle/release/app-release.aab
 
+      - name: Upload Phone APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FoilTrackerPhone-apk
+          path: FoilTrackerPhone/app/build/outputs/apk/release/app-release.apk
+
       - name: Upload Watch AAB
         uses: actions/upload-artifact@v4
         with:
           name: FoilTrackerWatch-aab
           path: FoilTrackerWatch/app/build/outputs/bundle/release/app-release.aab
+
+      - name: Upload Watch APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FoilTrackerWatch-apk
+          path: FoilTrackerWatch/app/build/outputs/apk/release/app-release.apk
 
       # ----------------------------------------
       # Clean signing files
@@ -96,27 +124,62 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ----------------------------------------
+      # Download artifacts
+      # ----------------------------------------
+
       - name: Download Phone AAB
         uses: actions/download-artifact@v4
         with:
           name: FoilTrackerPhone-aab
-          path: ./aab/phone
+          path: ./release/phone-aab
+
+      - name: Download Phone APK
+        uses: actions/download-artifact@v4
+        with:
+          name: FoilTrackerPhone-apk
+          path: ./release/phone-apk
 
       - name: Download Watch AAB
         uses: actions/download-artifact@v4
         with:
           name: FoilTrackerWatch-aab
-          path: ./aab/watch
+          path: ./release/watch-aab
 
-      - name: Rename AABs
+      - name: Download Watch APK
+        uses: actions/download-artifact@v4
+        with:
+          name: FoilTrackerWatch-apk
+          path: ./release/watch-apk
+
+      # ----------------------------------------
+      # Rename files
+      # ----------------------------------------
+
+      - name: Rename release files
         run: |
-          mv ./aab/phone/app-release.aab ./aab/FoilTrackerPhone-release.aab
-          mv ./aab/watch/app-release.aab ./aab/FoilTrackerWatch-release.aab
+          mv ./release/phone-aab/app-release.aab \
+             ./release/FoilTrackerPhone-release.aab
+
+          mv ./release/phone-apk/app-release.apk \
+             ./release/FoilTrackerPhone-release.apk
+
+          mv ./release/watch-aab/app-release.aab \
+             ./release/FoilTrackerWatch-release.aab
+
+          mv ./release/watch-apk/app-release.apk \
+             ./release/FoilTrackerWatch-release.apk
+
+      # ----------------------------------------
+      # Create GitHub Release
+      # ----------------------------------------
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./aab/FoilTrackerPhone-release.aab
-            ./aab/FoilTrackerWatch-release.aab
+            ./release/FoilTrackerPhone-release.aab
+            ./release/FoilTrackerPhone-release.apk
+            ./release/FoilTrackerWatch-release.aab
+            ./release/FoilTrackerWatch-release.apk
           generate_release_notes: true
