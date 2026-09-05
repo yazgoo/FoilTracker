@@ -1,0 +1,1 @@
+../../FoilTrackerWatch/core/build.gradle.kts

@@ -1,5 +1,5 @@
 (
-./gradlew :core:run --args="'$1'"|awk -F'runDuration=' '{
+./gradlew :core:build :core:run --args="'$1'"|awk -F'runDuration=' '{
     if ($2 == prev) {
         count++
     } else {

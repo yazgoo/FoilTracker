@@ -52,7 +52,8 @@ object GpxTrackReader {
                 } catch (_: Exception) {
                 }
 
-                isXIncludeAware = false
+                isNamespaceAware = true
+                // isXIncludeAware = false
                 isExpandEntityReferences = false
             }
 

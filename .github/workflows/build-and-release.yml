@@ -60,6 +60,20 @@ jobs:
         run: chmod +x ${{ matrix.project }}/gradlew
 
       # ----------------------------------------
+      # Ruby / GPX validation dependencies
+      # ----------------------------------------
+
+      - name: Set up Ruby
+        if: matrix.project == 'FoilTrackerWatch'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
+      - name: Install GPX validation dependencies
+        if: matrix.project == 'FoilTrackerWatch'
+        run: gem install nokogiri
+
+      # ----------------------------------------
       # Signing
       # ----------------------------------------
 
@@ -69,6 +83,16 @@ jobs:
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode \
             > ${{ matrix.project }}/app/upload-keystore.jks
+
+      # ----------------------------------------
+      # Watch GPX expectations
+      # ----------------------------------------
+
+      - name: Validate FoilTracker expectations
+        if: matrix.project == 'FoilTrackerWatch'
+        working-directory: FoilTrackerWatch
+        shell: bash
+        run: ./validate_expectations.sh
 
       # ----------------------------------------
       # Build

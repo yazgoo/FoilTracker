@@ -20,3 +20,4 @@ dependencyResolutionManagement {
 rootProject.name = "FoilTrackerPhone"
 
 include(":app")
+include(":core")
