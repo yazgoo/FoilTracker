@@ -99,7 +99,7 @@ class RunDurationCalculator {
          * The existing constant was named MAX_ACCEL_MPS2, but changing
          * this value or converting units would change behavior.
          */
-        private const val MAX_ACCEL_MPS2 = 5.0
+        // private const val MAX_ACCEL_MPS2 = 5.0
 
         private const val MIN_TIME_SECONDS = 20.0
 
@@ -276,6 +276,7 @@ class RunDurationCalculator {
                     (speedKmh - previous.speedKmh) / 3.6
                 ) / dt
 
+                /*
             if (
                 kotlin.math.abs(accelerationMps2) >=
                 MAX_ACCEL_MPS2
@@ -286,6 +287,7 @@ class RunDurationCalculator {
                 speedSamples.addLast(sample)
                 return events
             }
+            */
 
             /*
              * Preserve the existing chunking behavior.
