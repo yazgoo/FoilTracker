@@ -12,7 +12,14 @@ class FoilTrackerReporter {
         val duration: String,
         val distance: String,
         val speed: String,
-    )
+    ) {
+        override fun toString() : String {
+            if(all != "") {
+                return all
+            }
+            return "${startTime} -> ${duration} ${distance} ${speed}"
+        }
+    }
     data class Report(
         val runs : List<RunReport>,
     ) {
