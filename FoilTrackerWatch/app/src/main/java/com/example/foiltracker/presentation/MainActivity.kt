@@ -192,6 +192,10 @@ class MainActivity : ComponentActivity() {
         LocationService.runDurationSeconds
             .collectAsState()
 
+        val runDistanceMeters by
+        LocationService.runDistanceMeters
+            .collectAsState()
+
         val heartRateBpm by
         LocationService.heartRateBpm
             .collectAsState()
@@ -295,6 +299,11 @@ class MainActivity : ComponentActivity() {
                         ),
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = runDistanceMeters?.let {
+                        "${it.toInt()} m"
+                    } ?: "-- m"
                 )
 
                 /*

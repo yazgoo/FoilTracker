@@ -70,11 +70,13 @@ fun TrackViewerScreen(
         text =
             withContext(Dispatchers.IO) {
 
-                var content = ""
+                var content = "Runs\n\n"
+                content += "Start    Duration    Distance    Speed"
                 try {
-
                     val file = File(track.localPath)
-                    content += FoilTrackerReporter().getReportString(file, false)
+                    FoilTrackerReporter().getReport(file, false)!!.runs.forEach { run ->
+                        content += "\n\n${run.startTime}    ${run.duration}    ${run.distance}    ${run.speed}"
+                    }
                 } catch (exception: Exception) {
 
                     "Unable to read GPX:\n\n" +

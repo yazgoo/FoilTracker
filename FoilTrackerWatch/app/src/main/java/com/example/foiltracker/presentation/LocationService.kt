@@ -92,6 +92,13 @@ class LocationService : Service() {
             StateFlow<Long> =
             _runDurationSeconds.asStateFlow()
 
+        private val _runDistanceMeters =
+            MutableStateFlow(0L)
+
+        val runDistanceMeters:
+            StateFlow<Long> =
+            _runDistanceMeters.asStateFlow()
+
 
         /*
          * ---------------------------------------------------------
@@ -284,6 +291,9 @@ class LocationService : Service() {
                      */
                     _runDurationSeconds.value =
                         result.runDurationSeconds
+
+                    _runDistanceMeters.value =
+                        result.runDistanceMeters
 
 
                     /*
@@ -479,6 +489,9 @@ class LocationService : Service() {
         _runDurationSeconds.value =
             0L
 
+        _runDistanceMeters.value =
+            0L
+
 
         /*
          * Reset heart rate.
@@ -639,6 +652,8 @@ class LocationService : Service() {
             _runDurationSeconds.value =
                 calculator.currentRunDurationSeconds
 
+            _runDistanceMeters.value =
+                calculator.currentRunDistanceMeters
 
             val completedFile =
                 closeGpxFile()

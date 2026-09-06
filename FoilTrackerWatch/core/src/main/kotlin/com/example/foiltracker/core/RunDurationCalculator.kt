@@ -67,6 +67,7 @@ data class ProcessPointResult(
      */
     val runDurationSeconds: Long,
 
+    val runDistanceMeters: Long,
     /**
      * State-machine events caused by this point.
      */
@@ -111,6 +112,9 @@ class RunDurationCalculator {
     val currentRunDurationSeconds: Long
         get() = runDurationSeconds
 
+    val currentRunDistanceMeters: Long
+        get() = runDistanceMeters
+
     private data class SpeedSample(
         val timeMs: Long,
         val speedKmh: Double
@@ -123,11 +127,19 @@ class RunDurationCalculator {
 
     private var candidateStartMs: Long? = null
 
+    private var candidateStartDistanceMeter: Long? = null
+
     private var candidateLastMs: Long? = null
+
+    private var candidateLastMeters: Long? = null
 
     private var above7SinceMs: Long? = null
 
     private var runDurationSeconds: Long = 0L
+
+    private var runDistanceMeters: Long = 0L
+
+    private var totalDistanceMeters: Long = 0L
 
     /**
      * Process one GPS point.
@@ -153,6 +165,7 @@ class RunDurationCalculator {
                 speedKmh = 0.0,
                 acceptedForGpx = true,
                 runDurationSeconds = runDurationSeconds,
+                runDistanceMeters = runDistanceMeters,
                 events = emptyList()
             )
         }
@@ -193,7 +206,8 @@ class RunDurationCalculator {
         val events =
             processSpeedSample(
                 timeMs = point.timeMs,
-                speedKmh = calculatedSpeedKmh
+                speedKmh = calculatedSpeedKmh,
+                distanceMeters, 
             )
 
         /*
@@ -216,6 +230,7 @@ class RunDurationCalculator {
             speedKmh = calculatedSpeedKmh,
             acceptedForGpx = acceptedForGpx,
             runDurationSeconds = runDurationSeconds,
+            runDistanceMeters = runDistanceMeters,
             events = events
         )
     }
@@ -236,9 +251,10 @@ class RunDurationCalculator {
 
     private fun processSpeedSample(
         timeMs: Long,
-        speedKmh: Double
+        speedKmh: Double,
+        distanceMeters: Float,
     ): List<RunDurationEvent> {
-
+        totalDistanceMeters += distanceMeters.toLong()
         /*
          * The existing algorithm rejects speeds outside
          * MIN_SPEED..MAX_SPEED.
@@ -271,12 +287,12 @@ class RunDurationCalculator {
             /*
              * Preserve the existing acceleration calculation exactly.
              */
+            /*
             val accelerationMps2 =
                 (
                     (speedKmh - previous.speedKmh) / 3.6
                 ) / dt
 
-                /*
             if (
                 kotlin.math.abs(accelerationMps2) >=
                 MAX_ACCEL_MPS2
@@ -305,6 +321,7 @@ class RunDurationCalculator {
          */
         if (candidateStartMs == null) {
             candidateStartMs = timeMs
+            candidateStartDistanceMeter = totalDistanceMeters.toLong()
         }
 
         candidateLastMs = timeMs
@@ -314,6 +331,14 @@ class RunDurationCalculator {
                 candidateLastMs!! -
                     candidateStartMs!!
                 ) / 1000.0
+
+        candidateLastMeters = totalDistanceMeters.toLong()
+
+        val distanceMeters =
+            (
+                candidateLastMeters!! -
+                    candidateStartDistanceMeter!!
+                )
 
         /*
          * Ruby:
@@ -335,6 +360,9 @@ class RunDurationCalculator {
 
             runDurationSeconds =
                 durationSeconds.toLong()
+
+            runDistanceMeters = distanceMeters
+                
 
             return events
         }
@@ -383,6 +411,7 @@ class RunDurationCalculator {
 
         above7SinceMs = null
         candidateStartMs = null
+        candidateStartDistanceMeter = null
         candidateLastMs = null
         speedSamples.clear()
 

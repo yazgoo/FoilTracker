@@ -6,6 +6,20 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 class FoilTrackerReporter {
+    data class RunReport(
+        val all: String,
+        val startTime: String,
+        val duration: String,
+        val distance: String,
+        val speed: String,
+    )
+    data class Report(
+        val runs : List<RunReport>,
+    ) {
+        override fun toString() : String {
+            return runs.joinToString("\n")
+        }
+    }
     private fun formatDuration(
         seconds: Long
     ): String {
@@ -34,7 +48,7 @@ class FoilTrackerReporter {
         )
     }
 
-    fun getReportString(file: File, all: Boolean) : String? {
+    fun getReport(file: File, all: Boolean) : Report? {
 
         val points =
         try {
@@ -61,10 +75,11 @@ class FoilTrackerReporter {
 
         val startTimeMs = points.first().timeMs
 
-        var output = "Single Attempts\n\n"
-        output += "time -> duration"
         var previousRunDurationSeconds = 0L
+        var previousRunDistanceMeters = 0L
         var pointTime = 0L
+        val runs = mutableListOf<RunReport>()
+
         points.forEachIndexed { index, point ->
 
             val result =
@@ -78,31 +93,48 @@ class FoilTrackerReporter {
             )
 
             if(all) {
-                output +=
-                "point=${index + 1} " +
-                "reltime=${formatDuration((point.timeMs - startTimeMs)/1000)} " +
-                "time=$time " +
-                "lat=${point.latitude} " +
-                "lon=${point.longitude} " +
-                "distanceMeters=${"%.3f".format(result.distanceMeters)} " +
-                "speedKmh=${"%.3f".format(result.speedKmh)} " +
-                "acceptedForGpx=${result.acceptedForGpx} " +
-                "runDuration=${formatDuration(result.runDurationSeconds)}"
-                output += "\n"
+                runs.add(
+                    RunReport(
+                        all = 
+                        "point=${index + 1} " +
+                        "reltime=${formatDuration((point.timeMs - startTimeMs)/1000)} " +
+                        "time=$time " +
+                        "lat=${point.latitude} " +
+                        "lon=${point.longitude} " +
+                        "distanceMeters=${"%.3f".format(result.distanceMeters)} " +
+                        "speedKmh=${"%.3f".format(result.speedKmh)} " +
+                        "acceptedForGpx=${result.acceptedForGpx} " +
+                        "runDuration=${formatDuration(result.runDurationSeconds)}",
+                        startTime = "",
+                        duration = "",
+                        distance = "",
+                        speed = "",
+                    )
+                )
             } else {
 
                 if(result.runDurationSeconds < previousRunDurationSeconds || index + 1 == points.size) {
-                    output += "\n\n" +
-                    "${formatDuration((pointTime - startTimeMs)/1000)} -> " +
-                    "${formatDuration(previousRunDurationSeconds)}"
+                    runs.add(
+                        RunReport(
+                            all = "",
+                            startTime = formatDuration((pointTime - startTimeMs)/1000),
+                            duration = formatDuration(previousRunDurationSeconds),
+                            distance = "${previousRunDistanceMeters} m",
+                            speed = String.format(
+                                "%.1f km/h",
+                                3.6 * previousRunDistanceMeters / previousRunDurationSeconds
+                            ) 
+                        )
+                    )
                 }
 
                 if(previousRunDurationSeconds != result.runDurationSeconds) {
                     pointTime = point.timeMs
                 }
                 previousRunDurationSeconds = result.runDurationSeconds
+                previousRunDistanceMeters = result.runDistanceMeters
             }
         }
-        return output
+        return Report(runs)
     }
 }

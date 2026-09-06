@@ -19,7 +19,7 @@ fun main(
     val file =
         File(args[0])
 
-    val content : String? = FoilTrackerReporter().getReportString(file, args.size == 1)
+    val content : String? = FoilTrackerReporter().getReport(file, args.size == 1).toString()
 
     if(content == null) {
         System.exit(1)
