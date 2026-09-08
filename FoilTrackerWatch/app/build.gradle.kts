@@ -14,14 +14,14 @@ val buildDate = SimpleDateFormat(
 ).format(Date())
 
 android {
-    namespace = "com.example.foiltracker"
+    namespace = "org.piouz.pumpfoil"
     compileSdk {
         version = release(37)
     }
 
 
     defaultConfig {
-        applicationId = "com.example.foiltracker"
+        applicationId = "org.piouz.pumpfoil"
         minSdk = 30
         targetSdk = 37
         versionCode = 1

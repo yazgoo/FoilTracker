@@ -9,6 +9,6 @@ kotlin {
 
 application {
     mainClass.set(
-        "com.example.foiltracker.core.FoilTrackerCliKt"
+        "org.piouz.pumpfoil.core.FoilTrackerCliKt"
     )
 }

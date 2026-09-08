@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FoilTracker"
+rootProject.name = "Piouz Pumpfoil"
 include(":app")
 include(":core")

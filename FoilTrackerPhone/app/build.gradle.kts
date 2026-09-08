@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.foiltracker"
+    namespace = "org.piouz.pumpfoil"
 
     compileSdk = 36
     
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.foiltracker"
+        applicationId = "org.piouz.pumpfoil"
 
         minSdk = 26
 

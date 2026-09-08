@@ -1,15 +1,15 @@
 --------- beginning of main
 08-15 13:55:29.007 13592 13592 E FoilTracker: LocationService created
-08-15 13:55:29.035 13592 13592 E FoilTracker: UGUU45 Creating GPX: /data/user/0/com.example.foiltracker/files/foiltrack_20260815_135529.gpx and hashcode=236535094
+08-15 13:55:29.035 13592 13592 E FoilTracker: UGUU45 Creating GPX: /data/user/0/org.piouz.pumpfoil/files/foiltrack_20260815_135529.gpx and hashcode=236535094
 08-15 13:55:29.039 13592 13592 E FoilTracker: Starting GPS_PROVIDER: interval=1000ms
 08-15 13:55:29.047 13592 13592 E FoilTracker: UGUU3-45 requestLocationUpdates RETURNED
 08-15 14:01:17.889 14078 14078 E FoilTracker: LocationService created
-08-15 14:01:17.917 14078 14078 E FoilTracker: UGUU45 Creating GPX: /data/user/0/com.example.foiltracker/files/foiltrack_20260815_140117.gpx
+08-15 14:01:17.917 14078 14078 E FoilTracker: UGUU45 Creating GPX: /data/user/0/org.piouz.pumpfoil/files/foiltrack_20260815_140117.gpx
 08-15 14:01:17.920 14078 14078 E FoilTracker: Starting GPS_PROVIDER: interval=1000ms
 08-15 14:01:17.928 14078 14078 E FoilTracker: UGUU45 requestLocationUpdates RETURNED
 08-15 14:01:17.943 14078 14078 E FoilTracker: UGUU45 LAST LOCATION = null
 08-15 14:05:48.718 14481 14481 E FoilTracker: LocationService created
-08-15 14:05:48.746 14481 14481 E FoilTracker: UGUU45 Creating GPX: /data/user/0/com.example.foiltracker/files/foiltrack_20260815_140548.gpx
+08-15 14:05:48.746 14481 14481 E FoilTracker: UGUU45 Creating GPX: /data/user/0/org.piouz.pumpfoil/files/foiltrack_20260815_140548.gpx
 08-15 14:05:48.749 14481 14481 E FoilTracker: Starting GPS_PROVIDER: interval=1000ms
 08-15 14:05:48.759 14481 14481 E FoilTracker: GNSS status callback registered
 08-15 14:05:48.768 14481 14481 E FoilTracker: UGUU45 requestLocationUpdates RETURNED
@@ -93,11 +93,11 @@
 08-15 14:06:10.472 14481 14481 E FoilTracker: GNSS satellites visible=27 usedInFix=19
 08-15 14:06:10.776 14481 14481 E FoilTracker: Stopping GPS
 08-15 14:06:10.780 14481 14481 E FoilTracker: GNSS status callback unregistered
-08-15 14:06:10.781 14481 14481 E FoilTracker: GPX closed: /data/user/0/com.example.foiltracker/files/foiltrack_20260815_140548.gpx
+08-15 14:06:10.781 14481 14481 E FoilTracker: GPX closed: /data/user/0/org.piouz.pumpfoil/files/foiltrack_20260815_140548.gpx
 08-15 14:06:10.800 14481 14481 E FoilTracker: LocationService destroyed
 08-15 14:06:10.801 14481 14481 E FoilTracker: GPX closed: null
 08-15 14:09:38.966 14909 14909 E FoilTracker: LocationService created
-08-15 14:09:38.997 14909 14909 E FoilTracker: UGUU45 Creating GPX: /data/user/0/com.example.foiltracker/files/foiltrack_20260815_140938.gpx
+08-15 14:09:38.997 14909 14909 E FoilTracker: UGUU45 Creating GPX: /data/user/0/org.piouz.pumpfoil/files/foiltrack_20260815_140938.gpx
 08-15 14:09:39.001 14909 14909 E FoilTracker: Starting GPS_PROVIDER: interval=1000ms
 08-15 14:09:39.006 14909 14909 E FoilTracker: GNSS status callback registered=true
 08-15 14:09:39.015 14909 14909 E FoilTracker: UGUU45 requestLocationUpdates RETURNED

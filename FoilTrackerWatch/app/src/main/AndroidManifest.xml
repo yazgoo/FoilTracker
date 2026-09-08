@@ -19,7 +19,7 @@
 
     <application
         android:allowBackup="false"
-        android:label="FoilTracker"
+        android:label="Piouz Pumpfoil"
         android:icon="@drawable/piouz_logo"
         android:supportsRtl="true">
 
