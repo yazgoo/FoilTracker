@@ -7,6 +7,21 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.wear.ambient.AmbientLifecycleObserver
-
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.delay
 
 import java.time.LocalTime
@@ -39,6 +55,63 @@ import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
+    @Composable
+    fun SlideToConfirm(
+        text: String,
+        onConfirmed: () -> Unit
+    ) {
+        var offsetX by remember { mutableFloatStateOf(0f) }
+        var maxOffset by remember { mutableFloatStateOf(0f) }
+
+        val thumbSize = 40.dp
+        val density = LocalDensity.current
+        val thumbSizePx = with(density) { thumbSize.toPx() }
+
+        Box(
+            modifier = Modifier
+            .width(100.dp)
+            .height(32.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .onSizeChanged { size ->
+                maxOffset = (size.width - thumbSizePx).coerceAtLeast(0f)
+            }
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            Box(
+                modifier = Modifier
+                .offset { IntOffset(offsetX.roundToInt(), 0) }
+                .size(thumbSize)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary)
+                .pointerInput(maxOffset) {
+                    detectHorizontalDragGestures(
+                        onHorizontalDrag = { change, dragAmount ->
+                            change.consume()
+                            offsetX = (offsetX + dragAmount)
+                            .coerceIn(0f, maxOffset)
+                        },
+                        onDragEnd = {
+                            if (offsetX >= maxOffset * 0.9f) {
+                                onConfirmed()
+                            }
+                            offsetX = 0f
+                        }
+                    )
+                },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = null
+                )
+            }
+        }
+    } 
     companion object {
         private const val PERMISSIONS_REQUEST_CODE = 100
     }
@@ -320,26 +393,16 @@ class MainActivity : ComponentActivity() {
                         "build: ${BuildConfig.BUILD_DATE}"
                 )
 
-                Button(
-                    onClick = {
-
+                SlideToConfirm(
+                    text = if (recording) "STOP" else "START",
+                    onConfirmed = {
                         if (recording) {
                             stopTracking()
                         } else {
                             startTracking()
                         }
                     }
-                ) {
-
-                    Text(
-                        text =
-                            if (recording) {
-                                "STOP"
-                            } else {
-                                "START"
-                            }
-                    )
-                }
+                )
             }
         }
     }
