@@ -9,7 +9,7 @@ android {
     namespace = "org.piouz.pumpfoil"
 
     compileSdk = 36
-    
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -23,12 +23,16 @@ android {
         applicationId = "org.piouz.pumpfoil"
 
         minSdk = 26
-
         targetSdk = 36
 
-        versionCode = 1
+        versionCode = providers.gradleProperty("versionCode")
+            .orElse("1")
+            .get()
+            .toInt()
 
-        versionName = "1.0"
+        versionName = providers.gradleProperty("versionName")
+            .orElse("0.0.0")
+            .get()
     }
 
     buildFeatures {
@@ -40,6 +44,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
     signingConfigs {
         create("release") {
             val keystoreFile = file("upload-keystore.jks")
@@ -61,76 +66,32 @@ android {
 }
 
 dependencies {
-
     implementation(project(":core"))
 
-    implementation(
-        "androidx.core:core-ktx:1.17.0"
-    )
+    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.activity:activity-compose:1.11.0")
 
     implementation(
-        "androidx.activity:activity-compose:1.11.0"
+        platform("androidx.compose:compose-bom:2025.08.00")
     )
 
-    implementation(
-        platform(
-            "androidx.compose:compose-bom:2025.08.00"
-        )
-    )
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
 
-    implementation(
-        "androidx.compose.ui:ui"
-    )
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.3")
 
-    implementation(
-        "androidx.compose.ui:ui-tooling-preview"
-    )
+    implementation("androidx.room:room-runtime:2.7.2")
+    implementation("androidx.room:room-ktx:2.7.2")
+    ksp("androidx.room:room-compiler:2.7.2")
 
-    implementation(
-        "androidx.compose.material3:material3"
-    )
+    implementation("com.google.android.gms:play-services-wearable:20.0.1")
 
-    implementation(
-        "androidx.compose.material:material-icons-extended"
-    )
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 
-    implementation(
-        "androidx.lifecycle:lifecycle-runtime-ktx:2.9.3"
-    )
-
-    implementation(
-        "androidx.lifecycle:lifecycle-runtime-compose:2.9.3"
-    )
-
-    implementation(
-        "androidx.lifecycle:lifecycle-viewmodel-compose:2.9.3"
-    )
-
-    implementation(
-        "androidx.room:room-runtime:2.7.2"
-    )
-
-    implementation(
-        "androidx.room:room-ktx:2.7.2"
-    )
-
-    ksp(
-        "androidx.room:room-compiler:2.7.2"
-    )
-
-    implementation(
-        "com.google.android.gms:play-services-wearable:20.0.1"
-    )
-
-    implementation(
-        "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
-    )
-
-    implementation(
-        "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2"
-    )
-
-    debugImplementation(
-        "androidx.compose.ui:ui-tooling"
-    )
+    debugImplementation("androidx.compose.ui:ui-tooling")
 }
